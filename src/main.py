@@ -49,7 +49,14 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
         click.echo(f"Processing product with barcode: {barcode}")
 
         # 1. Amazon API Integration
-        amazon_data = api_integrator.get_amazon_product_data(barcode)
+        # First, convert barcode to ASIN if necessary. This is a placeholder.
+        # In a real scenario, you might use a dedicated API or a lookup table for this.
+        asin = row.get('asin') # Assuming ASIN is available or can be derived from barcode
+        if not asin:
+            click.echo(f"  Skipping {barcode}: ASIN not found or derivable.")
+            continue
+
+        amazon_data = api_integrator.get_amazon_product_data(asin)
         if not amazon_data:
             click.echo(f"  Skipping {barcode}: Could not get Amazon data.")
             continue
