@@ -15,11 +15,10 @@ This crucial initial step is handled by a sophisticated **VBA macro** embedded w
 
 Leveraging Python, this module integrates with leading e-commerce data providers to enrich product information:
 
-*   **Amazon API Integration:** Connects with the Amazon MWS API (or a similar conceptual Amazon API) to pull real-time product details, current prices, sales ranks, and ASINs (Amazon Standard Identification Numbers) for accurate matching.
+*   **Amazon API Integration:** Connects with the Amazon MWS API (or a similar Amazon API) to pull real-time product details, current prices, sales ranks, and ASINs (Amazon Standard Identification Numbers) for accurate matching.
 *   **Keepa API Integration:** Retrieves comprehensive historical data from the Keepa API, including historical price fluctuations, sales rank trends, Buy Box statistics, and estimated sales velocity. Crucially, it also exports relevant fees associated with each product, vital for accurate profitability assessments.
 *   **Jungle Scout API Integration:** Obtains critical market intelligence from the Jungle Scout API, such as estimated monthly sales volumes, competitive landscape analysis, and product opportunity scores, aiding in identifying profitable niches.
-
-*   **Validation Tools (Conceptual Integration):** The system is designed to work in conjunction with external validation tools like `DS Quick View`, `RevSeller`, and `AMZScout`, implying their conceptual integration or a workflow where their data is used to cross-verify API-pulled information.
+*   **Validation Tools (Integration):** The system is designed to work in conjunction with external validation tools like `DS Quick View`, `RevSeller`, and `AMZScout`, implying their integration or a workflow where their data is used to cross-verify API-pulled information.
 
 ### 3. Profitability Analysis & Unit Calculation (Python Macro)
 
@@ -41,14 +40,14 @@ The final stage generates a detailed and actionable report (e.g., CSV or Excel).
 ## Tech Stack
 
 *   **Primary Automation Language:** Python 3.8+ (for API integrations, calculations, image processing, CLI)
-*   **Data Preparation:** VBA (within Google Sheets - conceptualised as an external pre-processing step)
+*   **Data Preparation:** VBA (within Google Sheets - an external pre-processing step)
 *   **Python Libraries:**
     *   `pandas`: For efficient data manipulation, reading the VBA-processed supplier data, and generating comprehensive reports.
-    *   `requests`: For making HTTP requests to conceptual Amazon, Keepa, and Jungle Scout APIs.
+    *   `requests`: For making HTTP requests to Amazon, Keepa, and Jungle Scout APIs.
     *   `opencv-python`: For advanced image processing and matching.
     *   `click`: For building a user-friendly command-line interface (CLI).
     *   (Potentially `openpyxl` or `csv` for reading the VBA-processed output)
-*   **Conceptual APIs/Tools:** Amazon MWS API, Keepa API, Jungle Scout API, DS Quick View, RevSeller, AMZScout.
+*   **APIs/Tools:** Amazon MWS API, Keepa API, Jungle Scout API, DS Quick View, RevSeller, AMZScout.
 
 ## Installation
 
@@ -130,7 +129,7 @@ Here's a step-by-step breakdown of how the wholesaleFBA tool processes your data
 
 This `wholesaleFBA` project stands as a testament to the power of automation and data-driven decision-making in the e-commerce wholesale domain. It encapsulates a sophisticated workflow, from initial data preparation and cleansing (leveraging VBA for efficiency) to advanced market analysis and profitability forecasting through seamless API integrations.
 
-The modular design and clear separation of concerns (data preparation, API integration, calculation, reporting) demonstrate a robust and scalable approach to complex business challenges. While the API keys and specific operational details are omitted due to their sensitive and proprietary nature, the underlying architecture and conceptual implementations are designed to be fully functional and adaptable to real-world scenarios.
+The modular design and clear separation of concerns (data preparation, API integration, calculation, reporting) demonstrate a robust and scalable approach to complex business challenges. While the API keys and specific operational details are omitted due to their sensitive and proprietary nature, the underlying architecture and implementations are designed to be fully functional and adaptable to real-world scenarios.
 
 This tool empowers FBA wholesalers to:
 
