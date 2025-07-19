@@ -1,51 +1,99 @@
 # wholesaleFBA: Automated Amazon FBA Wholesale Optimiser
 
-This powerful command-line tool automates and optimises the Amazon FBA (Fulfilled by Amazon) wholesale business process. It intelligently parses and cleanses supplier data, enriches it with real-time market insights from Amazon, Keepa, and Jungle Scout APIs, and performs advanced profitability calculations for informed purchasing decisions.
+## Revolutionising Amazon FBA Wholesale Operations with Data-Driven Automation
+
+This project presents a sophisticated, end-to-end solution designed to automate and optimise the Amazon FBA (Fulfilled by Amazon) wholesale business process. By intelligently parsing and cleansing supplier data, enriching it with real-time market insights from leading e-commerce APIs, and performing advanced profitability calculations, `wholesaleFBA` empowers informed purchasing decisions and maximises return on investment.
 
 ## Key Features
 
-### 1. Supplier Data Ingestion & Cleansing (VBA within Google Sheets)
+*   **Automated Supplier Data Processing:** Efficiently handles large supplier lists (100,000+ entries) through a robust Google Sheets-based VBA macro for initial cleansing and structuring.
+*   **Comprehensive Product Data Enrichment:** Integrates with Amazon SP-API, Keepa API, and Jungle Scout API to pull critical real-time and historical market data.
+*   **Accurate Product Matching & Verification:** Leverages Keepa for barcode-to-ASIN conversion and Amazon SP-API for image retrieval, enabling visual verification against supplier images to ensure precise product association.
+*   **Advanced Profitability & Unit Calculation:** Implements precise formulas for profit, profit percentage, Return on Investment (ROI), and optimal unit recommendations, all calculated within the central Google Sheet.
+*   **Dynamic Reporting & Visualisation:** Utilises Google Sheets' capabilities for real-time data updates and conditional formatting, providing immediate visual insights into product profitability.
+*   **Modular and Scalable Architecture:** Designed with clear separation of concerns, allowing for easy maintenance, future enhancements, and adaptability to evolving e-commerce landscapes.
 
-This crucial initial step is handled by a sophisticated **VBA macro** embedded within Google Sheets. It's designed to automate the parsing, consolidation, cleansing, and structuring of massive supplier lists (100,000+ entries). This ensures the raw data is transformed into a clean, standardised format, ready for subsequent automated processing.
+## End-to-End Workflow: A Visual Flow Diagram
 
-*   **Input:** Raw supplier data files (e.g., CSV, Excel files).
-*   **Output (for Python):** A meticulously cleansed and structured dataset, typically exported as a CSV or Excel file, serving as the primary input for the Python-based modules.
+The `wholesaleFBA` system operates through a seamless, automated workflow, with a central Google Sheet serving as the primary data hub.
 
-### 2. Product Data Enrichment (Python with Advanced API Integrations)
+```mermaid
+graph TD
+    A[Supplier Data (CSV/Excel)] --> B(Email Inbox - Conceptual Automation);
+    B --> C{Google Sheet - Initial Processing};
+    C -- VBA Macro (Conceptual) --> D[Cleansed Supplier Data in Google Sheet];
+    D -- Python Script (wholesaleFBA) --> E(API Integration Layer);
+    E -- Amazon SP-API (Catalog Items) --> F[Product Details: ASIN, Title, Buy Box Price, Sales Rank, Main Image URL];
+    E -- Amazon SP-API (Product Fees) --> G[FBA Fee, Referral Fee];
+    E -- Keepa API --> H[Barcode to ASIN Conversion, Historical Price, Sales Rank History, Buy Box History, Estimated Sales Velocity];
+    E -- Jungle Scout API --> I[Estimated Monthly Sales, Number of Sellers, Opportunity Score];
+    F & G & H & I --> J{Python Script Writes Enriched Data Back to Google Sheet};
+    J --> K[Enriched Google Sheet];
+    K -- VBA Macro (Conceptual) --> L(Final Calculations & Visualisation);
+    L -- Image Verification --> M[Match Status];
+    L -- Profit Calculation --> N[Profit, Profit %, ROI];
+    L -- Unit Recommendation --> O[Recommended Units];
+    L -- Conditional Formatting --> P[Visual Profitability (Red to Green)];
+    P --> Q[Actionable Insights for Purchasing Decisions];
 
-Leveraging Python, this module integrates with leading e-commerce data providers to enrich product information:
+    subgraph Phase 1: Data Ingestion & Cleansing
+        A --> D;
+    end
 
-*   **Amazon API Integration:** Connects with the Amazon MWS API to pull real-time product details, current prices, sales ranks, and ASINs (Amazon Standard Identification Numbers) for accurate matching.
-*   **Keepa API Integration:** Retrieves comprehensive historical data from the Keepa API, including historical price fluctuations, sales rank trends, Buy Box statistics, and estimated sales velocity. Crucially, it also exports relevant fees associated with each product, vital for accurate profitability assessments.
-*   **Jungle Scout API Integration:** Obtains critical market intelligence from the Jungle Scout API, such as estimated monthly sales volumes, competitive landscape analysis, and product opportunity scores, aiding in identifying profitable niches.
-*   **Validation Tools (Integration):** The system is designed to work in conjunction with external validation tools like `DS Quick View`, `RevSeller`, and `AMZScout`, implying their integration or a workflow where their data is used to cross-verify API-pulled information.
+    subgraph Phase 2: Data Enrichment & API Integration
+        D --> J;
+    end
 
-### 3. Profitability Analysis & Optimal Unit Calculation (Python Module)
+    subgraph Phase 3: Final Analysis & Reporting
+        K --> Q;
+    end
+```
 
-This core Python module implements powerful calculations to guide purchasing decisions:
+**Detailed Workflow Steps:**
 
-*   **Profit Calculation:** Calculates the precise profit for each product using the formula:
-    `Profit = (Buy Box Price - (Amazon Fulfilment Cost + Amazon Referral Fee + VAT)) - Supplier Buy Price`
-*   **Optimal Unit Calculation:** Determines the optimal number of units to purchase, based on market demand and competition, using the formula:
-    `Recommended Units = Monthly Sales (from Jungle Scout) / Number of sellers within 15% of Buy Box Price`
+1.  **Supplier Data Ingestion & Initial Cleansing (Google Sheets & VBA)**
+    *   **Initial Data Receipt:** Raw supplier data (CSV or Excel) is received.
+    *   **Conceptual Email Automation:** (Due to signed NDA, actual code cannot be provided. This is a conceptual outline.) An automated process would ideally grab supplier files from a dedicated email inbox and pass them to the Google Sheets API for initial processing.
+    *   **VBA Macro Processing:** A sophisticated VBA macro (conceptual code provided in `vba/conceptual_macro.vba`) embedded within the Google Sheet performs the initial cleansing and structuring of the raw supplier data. This includes extracting key fields such as `image`, `barcode`, `price`, `quantity`, and `MOQ`, and removing irrelevant information.
+    *   **Output:** A clean, structured Google Sheet, serving as the primary input for the Python-based enrichment process.
 
-### 4. Image-based Verification (Python with Amazon SP-API)
+2.  **Python Processing - Data Enrichment & API Integration (Python Script)**
+    *   **Product Data Ingestion:** The `wholesaleFBA` Python script reads the cleansed supplier data directly from the Google Sheet using the Google Sheets API.
+    *   **Keepa API (Barcode to ASIN):** For each product, the script uses the Keepa API to convert the supplier's EAN barcode into an Amazon Standard Identification Number (ASIN), which is crucial for subsequent Amazon API calls.
+    *   **Amazon SP-API (Catalog Items):** The script queries the Amazon Selling Partner API (specifically the Catalog Items API for the UK marketplace) to pull real-time product details, including:
+        *   ASIN (if not already obtained from Keepa)
+        *   Product Title
+        *   Current Buy Box Price
+        *   Sales Rank
+        *   Main Product Image URL
+    *   **Amazon SP-API (Product Fees):** The script then uses the Amazon SP-API's Product Fees API to retrieve estimated FBA (Fulfilled by Amazon) fees and Referral fees associated with the product.
+    *   **Keepa API (Historical Data & Competitive Sellers):** The script leverages the Keepa API to fetch comprehensive historical data, including:
+        *   Historical price fluctuations
+        *   Sales rank trends
+        *   Detailed Buy Box history (used by the VBA macro for competitive seller analysis)
+        *   Estimated sales velocity
+    *   **Jungle Scout API:** The script integrates with the Jungle Scout API to obtain critical market intelligence, such as estimated monthly sales volumes, competitive landscape analysis, and product opportunity scores.
+    *   **Data Enrichment to Google Sheet:** All the newly acquired and enriched data from these APIs is then written back into the *same Google Sheet*, populating new columns and enhancing the existing supplier data.
 
-This module leverages the Amazon Selling Partner API (SP-API) to retrieve product images directly from Amazon listings. This provides a critical verification step to reduce false positives in product matching. By comparing supplier-provided images with Amazon's official product images, the system ensures accurate product association, especially when traditional identifiers (like barcodes) might lead to ambiguous matches.
+3.  **VBA Macro - Final Calculations & Reporting (within Google Sheets):**
+    *   **VBA Macro Execution:** Once the Python script has completed its data enrichment, the VBA macro (conceptual code in `vba/conceptual_macro.vba`) within the Google Sheet is executed.
+    *   **Image Verification:** The VBA macro compares the supplier's product image (from the initial cleansing) with the Amazon product image URL pulled by the Python script. This visual verification helps to confirm accurate product matches and reduce false positives, especially when barcodes might correspond to similar but distinct products.
+    *   **Profit Calculation:** The VBA macro calculates the precise profit for each product using the formula: `Profit = (Buy Box Price - (Amazon Fulfilment Cost + Amazon Referral Fee + VAT)) - Supplier Buy Price`.
+    *   **Optimal Unit Calculation:** The VBA macro determines the optimal number of units to purchase using the formula: `Recommended Units = Monthly Sales (from Jungle Scout) / Number of sellers within 15% of Buy Box Price`. The "number of sellers within 15% of Buy Box Price" is derived from the detailed Buy Box history provided by the Keepa API.
+    *   **Profit Percentage & ROI:** The VBA macro calculates the Profit Percentage and Return on Investment (ROI) for each product.
+    *   **Conditional Formatting:** The Google Sheet is dynamically coloured based on profitability, ranging from deep red (unprofitable) to vibrant green (highly profitable), providing immediate, actionable visual insights.
 
-### 5. Comprehensive Reporting
+## Technical Stack
 
-The final stage generates a detailed and actionable report (e.g., CSV or Excel). This report consolidates all the cleansed supplier data, enriched market insights, calculated profits, recommended purchase quantities, and any flagged discrepancies, serving as an indispensable tool for strategic purchasing decisions.
-
-## Tech Stack
-
-*   **Primary Automation Language:** Python 3.8+ (for API integrations, calculations, image processing, CLI)
-*   **Data Preparation:** VBA (within Google Sheets - an external pre-processing step)
+*   **Primary Automation Language:** Python 3.8+ (for API integrations, data processing, CLI)
+*   **Data Preparation & Final Reporting:** VBA (within Google Sheets - an external pre-processing and post-processing step)
 *   **Python Libraries:**
-    *   `pandas`: For efficient data manipulation, reading the VBA-processed supplier data (CSV or Excel), and generating comprehensive reports.
-    *   `requests`: For making HTTP requests to Amazon, Keepa, and Jungle Scout APIs.
+    *   `pandas`: For efficient data manipulation and processing.
+    *   `requests`: For making HTTP requests to external APIs.
     *   `click`: For building a user-friendly command-line interface (CLI).
-*   **APIs/Tools:** Amazon MWS API, Keepa API, Jungle Scout API, DS Quick View, RevSeller, AMZScout.
+    *   `gspread`: For seamless interaction with Google Sheets API (reading and writing data).
+    *   `google-auth-oauthlib`: For handling Google Sheets API authentication.
+*   **APIs/Tools:** Amazon Selling Partner API (SP-API - Catalog Items, Product Fees), Keepa API, Jungle Scout API, Google Sheets API, DS Quick View, RevSeller, AMZScout.
 
 ## Installation
 
@@ -72,17 +120,25 @@ The final stage generates a detailed and actionable report (e.g., CSV or Excel).
     JUNGLE_SCOUT_API_KEY=your_junglescout_api_key
     ```
 
+4.  **Google Sheets API Authentication:**
+    *   Go to the Google Cloud Console.
+    *   Create a new project or select an existing one.
+    *   Enable the "Google Sheets API" for your project.
+    *   Create a Service Account: Navigate to "APIs & Services" > "Credentials" > "Create Credentials" > "Service Account".
+    *   Download the JSON key file for your service account.
+    *   Place this JSON key file in your project directory (e.g., `path/to/your/service_account.json`).
+    *   Share your Google Sheet with the email address of your service account (found in the JSON key file).
+
 ## Usage
 
-1.  **Prepare Supplier Data:** Ensure your raw supplier data has been processed by the VBA macro in Google Sheets and exported as a clean CSV or Excel file (e.g., `data/cleansed_supplier_data.csv`).
-
+1.  **Prepare Supplier Data:** Ensure your raw supplier data has been processed by the VBA macro in Google Sheets and is available in your designated Google Sheet.
 2.  **Run the processing tool:**
 
     ```bash
     python src/main.py process_supplier_data --spreadsheet_name "Your Spreadsheet Name" --worksheet_name "Your Worksheet Name"
     ```
 
-    *(Note: Replace "Your Spreadsheet Name" and "Your Worksheet Name" with your actual Google Sheet details.)*
+    *(Note: Replace "Your Spreadsheet Name" and "Your Worksheet Name" with your actual Google Sheet details. Ensure the service account JSON key file path is correctly configured in `src/google_sheets_integrator.py`.)*
 
 ## Project Structure
 
@@ -102,29 +158,14 @@ wholesaleFBA/
 ├── README.md
 ```
 
-## Workflow Overview
+## Important Note on Conceptual Components
 
-Here's a step-by-step breakdown of how the `wholesaleFBA` tool integrates into your overall workflow:
+Due to the proprietary nature of certain components and the scope of this project, some aspects are presented conceptually. This includes:
 
-1.  **Supplier Data Preparation (VBA in Google Sheets):**
-    *   Raw supplier lists are processed by a VBA macro (conceptual code provided in `vba/conceptual_macro.vba`) to consolidate, cleanse, and structure the data within a Google Sheet.
-    *   **Conceptual Email Integration:** (Due to signed NDA, actual code cannot be provided. This is a conceptual outline.) An automated process would ideally grab supplier files from a dedicated email inbox and pass them to the Google Sheets API for initial processing by the VBA macro.
-    *   Output: A clean, structured Google Sheet ready for Python processing.
+*   **VBA Macro Code:** The actual, functional VBA code for Google Sheets is not provided in this repository. A conceptual outline is available in `vba/conceptual_macro.vba` to illustrate the logic for data cleansing, image verification, profit/unit calculation, and conditional formatting.
+*   **Email Integration:** The automated process for pulling supplier files directly from an email inbox is described conceptually. Actual implementation would require specific email client APIs or third-party services, which are outside the scope of this repository and may be subject to non-disclosure agreements (NDAs).
 
-2.  **Python Processing - Data Enrichment & Analysis:**
-    *   **Product Data Ingestion:** The Python script reads the cleansed supplier data directly from the Google Sheet using the Google Sheets API.
-    *   **Amazon API Integration:** Matches barcodes to Amazon listings, pulling real-time prices, sales ranks, ASINs, and main product image URLs.
-    *   **Keepa API Integration:** Retrieves historical price data, sales rank history, Buy Box statistics, and estimated sales velocity. It also performs barcode-to-ASIN conversion.
-    *   **Jungle Scout API Integration:** Obtains estimated monthly sales, competitive landscape analysis, and product opportunity scores.
-    *   **Data Enrichment to Google Sheet:** All enriched data from the APIs (including Amazon image URLs, sales ranks, buy box prices, FBA fees, referral fees, Keepa buy box history, Jungle Scout sales volume) is written back to the *same Google Sheet*.
-
-3.  **VBA Macro - Final Calculations & Reporting (within Google Sheets):**
-    *   The VBA macro (conceptual code provided in `vba/conceptual_macro.vba`) within the Google Sheet then takes this enriched data to:
-        *   Perform **Image Verification**: Compares supplier-provided image URLs with Amazon image URLs to confirm product matches.
-        *   Execute **Profit Calculation**: `Profit = (Buy Box Price - (Amazon Fulfilment Cost + Amazon Referral Fee + VAT)) - Supplier Buy Price`.
-        *   Execute **Optimal Unit Calculation**: `Recommended Units = Monthly Sales (from Jungle Scout) / Number of sellers within 15% of Buy Box Price`.
-        *   Calculate **Profit Percentage** and **Return on Investment (ROI)**.
-        *   Apply **Conditional Formatting**: Colors rows based on profitability (e.g., red for unprofitable, green for highly profitable).
+These conceptual elements highlight the full vision of the automated workflow while respecting proprietary information and focusing on the Python script's core role as the API integration and data enrichment engine.
 
 ## Project Summary & Conclusion
 
