@@ -20,7 +20,7 @@ Leveraging Python, this module integrates with leading e-commerce data providers
 *   **Jungle Scout API Integration:** Obtains critical market intelligence from the Jungle Scout API, such as estimated monthly sales volumes, competitive landscape analysis, and product opportunity scores, aiding in identifying profitable niches.
 *   **Validation Tools (Integration):** The system is designed to work in conjunction with external validation tools like `DS Quick View`, `RevSeller`, and `AMZScout`, implying their integration or a workflow where their data is used to cross-verify API-pulled information.
 
-### 3. Profitability Analysis & Unit Calculation (Python Macro)
+### 3. Profitability Analysis & Optimal Unit Calculation (Python Module)
 
 This core Python module implements powerful calculations to guide purchasing decisions:
 
