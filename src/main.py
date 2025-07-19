@@ -82,10 +82,9 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             buy_box_price
         )
 
-        # 5. Image Matching (Conceptual - requires image paths in supplier_df)
+        # 5. Image Matching (requires image paths in supplier_df)
         # For a real implementation, supplier_df would need columns for image paths
-        # is_image_matched = image_matcher.match_product_image(row['supplier_image_path'], amazon_data.get('amazon_image_path'))
-        is_image_matched = True # Simulate for now
+        is_image_matched = image_matcher.match_product_image(row['supplier_image_path'], amazon_data.get('amazon_image_path'))
 
         processed_data.append({
             'barcode': barcode,
@@ -106,9 +105,9 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
     
     processed_df = pd.DataFrame(processed_data)
 
-    # Apply image matching to reduce false positives (conceptual)
+    # Apply image matching to reduce false positives
     # This would typically be applied to a subset of data or as a verification step
-    # processed_df = image_matcher.reduce_false_positives(processed_df)
+    processed_df = image_matcher.reduce_false_positives(processed_df)
 
     # 6. Generate Reports
     report_generator.generate_report(processed_df, os.path.join('reports', 'wholesale_analysis_report.csv'))

@@ -15,7 +15,7 @@ This crucial initial step is handled by a sophisticated **VBA macro** embedded w
 
 Leveraging Python, this module integrates with leading e-commerce data providers to enrich product information:
 
-*   **Amazon API Integration:** Connects with the Amazon MWS API (or a similar Amazon API) to pull real-time product details, current prices, sales ranks, and ASINs (Amazon Standard Identification Numbers) for accurate matching.
+*   **Amazon API Integration:** Connects with the Amazon MWS API to pull real-time product details, current prices, sales ranks, and ASINs (Amazon Standard Identification Numbers) for accurate matching.
 *   **Keepa API Integration:** Retrieves comprehensive historical data from the Keepa API, including historical price fluctuations, sales rank trends, Buy Box statistics, and estimated sales velocity. Crucially, it also exports relevant fees associated with each product, vital for accurate profitability assessments.
 *   **Jungle Scout API Integration:** Obtains critical market intelligence from the Jungle Scout API, such as estimated monthly sales volumes, competitive landscape analysis, and product opportunity scores, aiding in identifying profitable niches.
 *   **Validation Tools (Integration):** The system is designed to work in conjunction with external validation tools like `DS Quick View`, `RevSeller`, and `AMZScout`, implying their integration or a workflow where their data is used to cross-verify API-pulled information.
@@ -76,7 +76,7 @@ The final stage generates a detailed and actionable report (e.g., CSV or Excel).
 
 ## Usage
 
-1.  **Prepare Supplier Data:** Ensure your raw supplier data has been processed by the conceptual VBA macro in Google Sheets and exported as a clean CSV or Excel file (e.g., `data/cleansed_supplier_data.csv`).
+1.  **Prepare Supplier Data:** Ensure your raw supplier data has been processed by the VBA macro in Google Sheets and exported as a clean CSV or Excel file (e.g., `data/cleansed_supplier_data.csv`).
 
 2.  **Run the processing tool:**
 
