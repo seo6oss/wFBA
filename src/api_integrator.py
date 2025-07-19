@@ -128,6 +128,54 @@ class APIIntegrator:
             return {"fba_fee": None, "referral_fee": None}
         # --- END AMAZON SP-API PRODUCT FEES INTEGRATION ---
 
+    def get_keepa_product_data(self, asin):
+        click.echo(f"  Integrating with Keepa API for ASIN: {asin}...")
+        if not self.keepa_api_key:
+            click.echo("    Keepa API Key not provided. Skipping Keepa integration.")
+            return {}
+
+        # The domain 'api.keepa.com' is standard. Authentication is via the 'key' query parameter.
+        keepa_api_url = f"https://api.keepa.com/product?key={self.keepa_api_key}&asin={asin}&domain=3" # Domain 3 for UK
+
+        try:
+            response = requests.get(keepa_api_url)
+            response.raise_for_status()
+            data = response.json()
+
+            # Parse Keepa API response
+            keepa_data = {
+                'historical_price': data.get('products', [{}])[0].get('data', {}).get('AMAZON'), # Example: Amazon price history
+                'sales_rank_history': data.get('products', [{}])[0].get('data', {}).get('SALES_RANK'),
+                'buy_box_history': data.get('products', [{}])[0].get('data', {}).get('BUY_BOX'),
+                'estimated_sales_velocity': data.get('products', [{}])[0].get('stats', {}).get('avg180', {}).get('salesRank'), # Example: 180-day average sales rank
+                'competitive_sellers': self._get_competitive_sellers_from_keepa_buybox(data.get('products', [{}])[0].get('data', {}).get('BUY_BOX')) # Extract competitive sellers
+            }
+            return keepa_data
+
+        except requests.exceptions.RequestException as e:
+            click.echo(f"    Error during Keepa API call: {e}")
+            return {}
+        # --- END KEEPA API INTEGRATION ---
+
+    def _get_competitive_sellers_from_keepa_buybox(self, buy_box_data, price_threshold=0.15, lookback_months=3):
+        # This is a simplified example. Real implementation would involve more robust parsing
+        # of Keepa's Buy Box history data to identify unique sellers and their prices within
+        # the specified price_threshold and lookback_months.
+        # Keepa's Buy Box data is often a list of [timestamp, price, seller_id, ...] tuples.
+        
+        if not buy_box_data:
+            return 0
+
+        competitive_seller_count = 0
+        unique_sellers = set()
+        for i in range(0, len(buy_box_data), 3):
+            if i + 2 < len(buy_box_data):
+                seller_id = buy_box_data[i+2]
+                if seller_id > 0:
+                    unique_sellers.add(seller_id)
+        
+        return len(unique_sellers)
+
     def get_jungle_scout_product_data(self, asin):
         click.echo(f"  Integrating with Jungle Scout API for ASIN: {asin}...")
         if not self.jungle_scout_api_key:
