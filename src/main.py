@@ -3,7 +3,7 @@ import pandas as pd
 import os
 from src.api_integrator import APIIntegrator
 from src.profit_calculator import ProfitCalculator
-from src.report_generator import ReportGenerator
+from src.google_sheets_integrator import GoogleSheetsIntegrator
 
 @click.group()
 def cli():
@@ -11,32 +11,26 @@ def cli():
     pass
 
 @cli.command()
-@click.option('--supplier_file', required=True, help='Path to the cleansed supplier data file (e.g., CSV or Excel).')
+@click.option('--spreadsheet_name', required=True, help='Name of the Google Spreadsheet.')
+@click.option('--worksheet_name', default=0, help='Name or index of the worksheet within the spreadsheet.')
 @click.option('--amazon_api_key', envvar='AMAZON_API_KEY', help='Amazon MWS API Key.')
 @click.option('--keepa_api_key', envvar='KEEPA_API_KEY', help='Keepa API Key.')
 @click.option('--jungle_scout_api_key', envvar='JUNGLE_SCOUT_API_KEY', help='Jungle Scout API Key.')
-def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_scout_api_key):
-    """Processes supplier data, enriches it with API data, calculates profitability, and generates reports.
-
-    Assumes supplier_file is already cleansed and structured (e.g., from VBA pre-processing).
+def process_supplier_data(spreadsheet_name, worksheet_name, amazon_api_key, keepa_api_key, jungle_scout_api_key):
+    """Processes supplier data from Google Sheet, enriches it with API data, and writes back to the sheet.
     """
-    click.echo(f"Starting processing for supplier file: {supplier_file}")
+    click.echo(f"Starting processing for Google Spreadsheet: {spreadsheet_name}, Worksheet: {worksheet_name}")
 
-    if not os.path.exists(supplier_file):
-        click.echo(f"Error: Supplier file not found at {supplier_file}")
-        return
-
-    # Load supplier data (assuming CSV for simplicity, can extend to Excel)
-    try:
-        supplier_df = pd.read_csv(supplier_file)
-        click.echo(f"Loaded {len(supplier_df)} rows from {supplier_df}")
-    except Exception as e:
-        click.echo(f"Error loading supplier file: {e}")
-        return
-
+    google_sheets_integrator = GoogleSheetsIntegrator()
     api_integrator = APIIntegrator(amazon_api_key, keepa_api_key, jungle_scout_api_key)
     profit_calculator = ProfitCalculator()
-    report_generator = ReportGenerator()
+
+    supplier_df = google_sheets_integrator.read_sheet_to_dataframe(spreadsheet_name, worksheet_name)
+    if supplier_df.empty:
+        click.echo("No data found in the specified Google Sheet. Exiting.")
+        return
+
+    click.echo(f"Loaded {len(supplier_df)} rows from Google Sheet.")
 
     processed_data = []
 
@@ -91,11 +85,11 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             buy_box_price
         )
 
-        # Image-based Verification
-        # Assuming supplier_df has a 'supplier_image_url' column
-        supplier_image_url = row.get('supplier_image_url')
+        # Image-based Verification (Image comparison handled by VBA in Google Sheet)
+        supplier_image_url = row.get('supplier_image_url') # Assuming this column exists in your sheet
         amazon_image_url = amazon_data.get('main_image_url')
-        is_image_matched = api_integrator.compare_images_by_url(supplier_image_url, amazon_image_url)
+        # The Python script will pull the Amazon image URL and write it back to the sheet.
+        # The VBA macro will then perform the actual image comparison.
 
         processed_data.append({
             'barcode': barcode,
@@ -111,17 +105,17 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             'estimated_monthly_sales': estimated_monthly_sales,
             'number_of_sellers': number_of_sellers,
             'recommended_units': recommended_units,
-            'is_image_matched': is_image_matched,
+            'amazon_image_url': amazon_image_url, # Write Amazon image URL back to sheet
             'keepa_data': keepa_data, # Include raw API data for detailed report
             'jungle_scout_data': jungle_scout_data # Include raw API data
         })
     
     processed_df = pd.DataFrame(processed_data)
 
-    # 6. Generate Reports
-    report_generator.generate_report(processed_df, os.path.join('reports', 'wholesale_analysis_report.xlsx'))
+    # Write processed data back to Google Sheet
+    google_sheets_integrator.write_dataframe_to_sheet(processed_df, spreadsheet_name, worksheet_name)
 
-    click.echo("Processing complete. Check the 'reports/' directory for the analysis report.")
+    click.echo("Processing complete. Check your Google Sheet for the updated data.")
 
 if __name__ == '__main__':
     cli()
