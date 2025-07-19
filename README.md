@@ -1,4 +1,4 @@
-# wholesaleFBA: Automated Amazon FBA Wholesale Optimiser
+# wholesaleFBA: Automated Amazon FBA Wholesale 
 
 ## Revolutionising Amazon FBA Wholesale Operations with Data-Driven Automation
 
