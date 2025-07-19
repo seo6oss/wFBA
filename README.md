@@ -29,9 +29,9 @@ This core Python module implements powerful calculations to guide purchasing dec
 *   **Optimal Unit Calculation:** Determines the optimal number of units to purchase, based on market demand and competition, using the formula:
     `Recommended Units = Monthly Sales (from Jungle Scout) / Number of sellers within 15% of Buy Box Price`
 
-### 4. Image-based Matching (Python with OpenCV Fail-safe)
+### 4. Image-based Verification (Python with Amazon SP-API)
 
-A robust Python module, leveraging `OpenCV`, provides a critical fail-safe mechanism. It uses image comparison techniques to reduce the number of false positives in product matching by an impressive 80%. This is particularly valuable when traditional identifiers (like barcodes) are missing or unreliable, ensuring accurate product association.
+This module leverages the Amazon Selling Partner API (SP-API) to retrieve product images directly from Amazon listings. This provides a critical verification step to reduce false positives in product matching. By comparing supplier-provided images with Amazon's official product images, the system ensures accurate product association, especially when traditional identifiers (like barcodes) might lead to ambiguous matches.
 
 ### 5. Comprehensive Reporting
 
@@ -44,7 +44,6 @@ The final stage generates a detailed and actionable report (e.g., CSV or Excel).
 *   **Python Libraries:**
     *   `pandas`: For efficient data manipulation, reading the VBA-processed supplier data (CSV or Excel), and generating comprehensive reports.
     *   `requests`: For making HTTP requests to Amazon, Keepa, and Jungle Scout APIs.
-    *   `opencv-python`: For advanced image processing and matching.
     *   `click`: For building a user-friendly command-line interface (CLI).
 *   **APIs/Tools:** Amazon MWS API, Keepa API, Jungle Scout API, DS Quick View, RevSeller, AMZScout.
 
@@ -94,7 +93,6 @@ wholesaleFBA/
 │   ├── main.py
 │   ├── api_integrator.py
 │   ├── profit_calculator.py
-│   ├── image_matcher.py
 │   ├── report_generator.py
 │   ├── data_prep_overview.md
 ├── data/
@@ -119,7 +117,7 @@ Here's a step-by-step breakdown of how the wholesaleFBA tool processes your data
     *   **Jungle Scout API Integration:** Obtains estimated monthly sales, competition data, and opportunity scores.
     *   **Profitability Calculation:** Computes profit based on Buy Box price, Amazon fees, VAT, and supplier cost.
     *   **Optimal Unit Calculation:** Determines recommended purchase quantities based on sales and competition.
-    *   **Image-based Matching (OpenCV):** Acts as a fail-safe to reduce false positives in product matching.
+    *   **Image-based Verification (Amazon SP-API):** Retrieves product images from Amazon listings for verification against supplier images, ensuring accurate product association and reducing false positives.
 
 3.  **Reporting:**
     *   A comprehensive report is generated, consolidating all enriched data, calculated profits, and recommended units.

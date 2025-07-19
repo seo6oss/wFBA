@@ -3,12 +3,11 @@ import pandas as pd
 import os
 from src.api_integrator import APIIntegrator
 from src.profit_calculator import ProfitCalculator
-from src.image_matcher import ImageMatcher
 from src.report_generator import ReportGenerator
 
 @click.group()
 def cli():
-    """A command-line tool for wholesale FBA automation and optimisation."""
+    """A command-line tool for wholesale FBA automation and optimisation.""" 
     pass
 
 @cli.command()
@@ -30,14 +29,13 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
     # Load supplier data (assuming CSV for simplicity, can extend to Excel)
     try:
         supplier_df = pd.read_csv(supplier_file)
-        click.echo(f"Loaded {len(supplier_df)} rows from {supplier_file}")
+        click.echo(f"Loaded {len(supplier_df)} rows from {supplier_df}")
     except Exception as e:
         click.echo(f"Error loading supplier file: {e}")
         return
 
     api_integrator = APIIntegrator(amazon_api_key, keepa_api_key, jungle_scout_api_key)
     profit_calculator = ProfitCalculator()
-    image_matcher = ImageMatcher()
     report_generator = ReportGenerator()
 
     processed_data = []
@@ -90,11 +88,6 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             buy_box_price
         )
 
-        # 5. Image Matching (requires image paths in supplier_df)
-        # For a real implementation, supplier_df would need columns for image paths
-        # You might also pull image URLs from Amazon SP-API or Keepa API if available
-        is_image_matched = image_matcher.match_product_image(row.get('supplier_image_path'), amazon_data.get('amazon_image_url'))
-
         processed_data.append({
             'barcode': barcode,
             'supplier_buy_price': supplier_buy_price,
@@ -107,16 +100,11 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             'estimated_monthly_sales': estimated_monthly_sales,
             'number_of_sellers': number_of_sellers,
             'recommended_units': recommended_units,
-            'is_image_matched': is_image_matched,
             'keepa_data': keepa_data, # Include raw API data for detailed report
             'jungle_scout_data': jungle_scout_data # Include raw API data
         })
     
     processed_df = pd.DataFrame(processed_data)
-
-    # Apply image matching to reduce false positives
-    # This would typically be applied to a subset of data or as a verification step
-    processed_df = image_matcher.reduce_false_positives(processed_df)
 
     # 6. Generate Reports
     report_generator.generate_report(processed_df, os.path.join('reports', 'wholesale_analysis_report.csv'))

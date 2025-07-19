@@ -29,12 +29,12 @@ class APIIntegrator:
             response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
             data = response.json()
 
-            # Parse Amazon SP-API Catalog Items response
             amazon_data = {
                 'asin': data.get('asin'),
                 'title': data.get('attributes', {}).get('item_name', [{}])[0].get('value'),
                 'buy_box_price': data.get('summaries', [{}])[0].get('buyBoxPrice', {}).get('amount'),
                 'sales_rank': data.get('salesRanks', [{}])[0].get('rank'),
+                'main_image_url': data.get('images', {}).get('main', {}).get('link') # Extract main image URL
             }
             
             # Get FBA and Referral Fees using Product Fees API
