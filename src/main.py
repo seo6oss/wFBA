@@ -7,7 +7,7 @@ from src.report_generator import ReportGenerator
 
 @click.group()
 def cli():
-    """A command-line tool for wholesale FBA automation and optimisation.""" 
+    """A command-line tool for wholesale FBA automation and optimisation."""
     pass
 
 @cli.command()
@@ -80,6 +80,9 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             supplier_buy_price
         )
         
+        profit_percentage = profit_calculator.calculate_profit_percentage(profit, buy_box_price)
+        roi = profit_calculator.calculate_roi(profit, supplier_buy_price)
+        
         estimated_monthly_sales = jungle_scout_data.get('estimated_monthly_sales', 0)
 
         recommended_units = profit_calculator.calculate_recommended_units(
@@ -87,6 +90,12 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             competitive_sellers,
             buy_box_price
         )
+
+        # Image-based Verification
+        # Assuming supplier_df has a 'supplier_image_url' column
+        supplier_image_url = row.get('supplier_image_url')
+        amazon_image_url = amazon_data.get('main_image_url')
+        is_image_matched = api_integrator.compare_images_by_url(supplier_image_url, amazon_image_url)
 
         processed_data.append({
             'barcode': barcode,
@@ -97,9 +106,12 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             'fba_fee': fba_fee,
             'referral_fee_percentage': referral_fee_percentage,
             'profit': profit,
+            'profit_percentage': profit_percentage,
+            'roi': roi,
             'estimated_monthly_sales': estimated_monthly_sales,
             'number_of_sellers': number_of_sellers,
             'recommended_units': recommended_units,
+            'is_image_matched': is_image_matched,
             'keepa_data': keepa_data, # Include raw API data for detailed report
             'jungle_scout_data': jungle_scout_data # Include raw API data
         })
@@ -107,7 +119,7 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
     processed_df = pd.DataFrame(processed_data)
 
     # 6. Generate Reports
-    report_generator.generate_report(processed_df, os.path.join('reports', 'wholesale_analysis_report.csv'))
+    report_generator.generate_report(processed_df, os.path.join('reports', 'wholesale_analysis_report.xlsx'))
 
     click.echo("Processing complete. Check the 'reports/' directory for the analysis report.")
 

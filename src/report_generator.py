@@ -1,16 +1,32 @@
 import click
 import pandas as pd
 import os
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
 
 class ReportGenerator:
-    def generate_report(self, data_frame, output_file='wholesale_report.csv'):
+    def generate_report(self, data_frame, output_file='wholesale_report.xlsx'):
         click.echo(f"Generating comprehensive report to {output_file}...")
-        data_frame.to_csv(output_file, index=False)
-        click.echo("Report generation complete.")
+        
+        # Save to Excel
+        writer = pd.ExcelWriter(output_file, engine='openpyxl')
+        workbook = writer.book
+        worksheet = writer.sheets['Wholesale Analysis']
 
-    def generate_discrepancy_report(self, data_frame, output_file='discrepancy_report.csv'):
-        click.echo(f"Generating discrepancy report to {output_file}...")
-        # In a real scenario, this would filter for rows with discrepancies
-        discrepancies = data_frame[data_frame['is_discrepancy'] == True] # Assuming a 'is_discrepancy' column
-        discrepancies.to_csv(output_file, index=False)
-        click.echo("Discrepancy report generation complete.")
+        # Apply conditional formatting (placeholder logic)
+        # Example: Color rows based on Profit % or ROI
+        # You would define your own thresholds and colors here.
+        green_fill = PatternFill(start_color="C6EFCE", end_color="C6EFCE", fill_type="solid") # Light green
+        red_fill = PatternFill(start_color="FFC7CE", end_color="FFC7CE", fill_type="solid")   # Light red
+
+        # Assuming 'profit_percentage' and 'roi' columns exist in data_frame
+        for row_idx, row_data in data_frame.iterrows():
+            if 'profit_percentage' in row_data and row_data['profit_percentage'] > 10:
+                for cell in worksheet[row_idx + 2]: # +2 because of header row and 0-based index
+                    cell.fill = green_fill
+            elif 'roi' in row_data and row_data['roi'] < 0:
+                for cell in worksheet[row_idx + 2]:
+                    cell.fill = red_fill
+
+        writer.close()
+        click.echo("Report generation complete.")
