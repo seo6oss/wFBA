@@ -49,9 +49,11 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
         click.echo(f"Processing product with barcode: {barcode}")
 
         # 1. Amazon API Integration
-        # First, convert barcode to ASIN if necessary. This is a placeholder.
-        # In a real scenario, you might use a dedicated API or a lookup table for this.
-        asin = row.get('asin') # Assuming ASIN is available or can be derived from barcode
+        # If ASIN is not directly available, attempt to get it from barcode using Keepa API
+        asin = row.get('asin')
+        if not asin and barcode:
+            asin = api_integrator.get_asin_from_barcode(barcode)
+
         if not asin:
             click.echo(f"  Skipping {barcode}: ASIN not found or derivable.")
             continue
@@ -61,13 +63,13 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
             click.echo(f"  Skipping {barcode}: Could not get Amazon data.")
             continue
         
-        asin = amazon_data.get('asin')
         buy_box_price = amazon_data.get('buy_box_price')
         fba_fee = amazon_data.get('fba_fee')
         referral_fee_percentage = amazon_data.get('referral_fee')
 
         # 2. Keepa API Integration
         keepa_data = api_integrator.get_keepa_product_data(asin)
+        competitive_sellers = keepa_data.get('competitive_sellers', 1) # Default to 1 to avoid division by zero
 
         # 3. Jungle Scout API Integration
         jungle_scout_data = api_integrator.get_jungle_scout_product_data(asin)
@@ -81,17 +83,17 @@ def process_supplier_data(supplier_file, amazon_api_key, keepa_api_key, jungle_s
         )
         
         estimated_monthly_sales = jungle_scout_data.get('estimated_monthly_sales', 0)
-        number_of_sellers = jungle_scout_data.get('number_of_sellers', 1) # Avoid division by zero
 
         recommended_units = profit_calculator.calculate_recommended_units(
             estimated_monthly_sales,
-            number_of_sellers,
+            competitive_sellers,
             buy_box_price
         )
 
         # 5. Image Matching (requires image paths in supplier_df)
         # For a real implementation, supplier_df would need columns for image paths
-        is_image_matched = image_matcher.match_product_image(row['supplier_image_path'], amazon_data.get('amazon_image_path'))
+        # You might also pull image URLs from Amazon SP-API or Keepa API if available
+        is_image_matched = image_matcher.match_product_image(row.get('supplier_image_path'), amazon_data.get('amazon_image_url'))
 
         processed_data.append({
             'barcode': barcode,

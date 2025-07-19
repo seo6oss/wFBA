@@ -42,11 +42,10 @@ The final stage generates a detailed and actionable report (e.g., CSV or Excel).
 *   **Primary Automation Language:** Python 3.8+ (for API integrations, calculations, image processing, CLI)
 *   **Data Preparation:** VBA (within Google Sheets - an external pre-processing step)
 *   **Python Libraries:**
-    *   `pandas`: For efficient data manipulation, reading the VBA-processed supplier data, and generating comprehensive reports.
+    *   `pandas`: For efficient data manipulation, reading the VBA-processed supplier data (CSV or Excel), and generating comprehensive reports.
     *   `requests`: For making HTTP requests to Amazon, Keepa, and Jungle Scout APIs.
     *   `opencv-python`: For advanced image processing and matching.
     *   `click`: For building a user-friendly command-line interface (CLI).
-    *   (Potentially `openpyxl` or `csv` for reading the VBA-processed output)
 *   **APIs/Tools:** Amazon MWS API, Keepa API, Jungle Scout API, DS Quick View, RevSeller, AMZScout.
 
 ## Installation

@@ -14,15 +14,10 @@ class APIIntegrator:
             click.echo("    Amazon API Key not provided. Skipping Amazon integration.")
             return {}
 
-        # --- AMAZON SELLING PARTNER API (SP-API) - CATALOG ITEMS API INTEGRATION ---
         # Endpoint for Catalog Items API (v2022-04-01) to get item details by ASIN.
-        # Replace 'YOUR_MARKETPLACE_ID' with the actual Amazon Marketplace ID (e.g., ATVPDKIKX0DER for US, A1F83G8C2ARO7P for UK).
-        # Authentication for SP-API is complex (LWA authorization flow).
-        # This example assumes a bearer token is obtained and used.
-
         amazon_api_url = f"https://sellingpartnerapi-eu.amazon.com/catalog/2022-04-01/items/{asin}" # Example for EU region
         headers = {
-            "x-amz-access-token": self.amazon_api_key, # This should be your LWA access token
+            "x-amz-access-token": self.amazon_api_key,
             "Content-Type": "application/json"
         }
         params = {
@@ -34,9 +29,7 @@ class APIIntegrator:
             response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
             data = response.json()
 
-            # --- PARSE AMAZON SP-API CATALOG ITEMS RESPONSE ---
-            # This parsing is based on common structures for the Catalog Items API.
-            # You may need to adjust keys based on the exact response for your specific product type.
+            # Parse Amazon SP-API Catalog Items response
             amazon_data = {
                 'asin': data.get('asin'),
                 'title': data.get('attributes', {}).get('item_name', [{}])[0].get('value'),
@@ -92,14 +85,10 @@ class APIIntegrator:
             click.echo("    Amazon API Key not provided. Skipping Amazon fees integration.")
             return {"fba_fee": None, "referral_fee": None}
 
-        # --- AMAZON SELLING PARTNER API (SP-API) - PRODUCT FEES API INTEGRATION ---
         # Endpoint for Product Fees API (v0) to get fee estimates.
-        # Authentication for SP-API is complex (LWA authorization flow).
-        # This example assumes a bearer token is obtained and used.
-
         fees_api_url = f"https://sellingpartnerapi-eu.amazon.com/fees/v0/products/feesEstimate"
         headers = {
-            "x-amz-access-token": self.amazon_api_key, # This should be your LWA access token
+            "x-amz-access-token": self.amazon_api_key,
             "Content-Type": "application/json"
         }
         payload = {
@@ -145,10 +134,7 @@ class APIIntegrator:
             click.echo("    Jungle Scout API Key not provided. Skipping Jungle Scout integration.")
             return {}
 
-        # --- JUNGLE SCOUT API INTEGRATION ---
         # This uses the Product Database API as an example.
-        # The endpoint and authentication method might vary based on your Jungle Scout plan.
-
         jungle_scout_api_url = f"https://api.junglescout.com/api/v1/products" # Common endpoint
         headers = {
             "Authorization": f"Bearer {self.jungle_scout_api_key}", # Common authentication method
@@ -161,11 +147,9 @@ class APIIntegrator:
             response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
             data = response.json()
 
-            # --- PARSE JUNGLE SCOUT API RESPONSE ---
-            # Jungle Scout API responses can vary. This parsing is based on common data points.
-            # You will need to adjust these keys based on the exact response structure for your query.
+            # Parse Jungle Scout API response
             jungle_scout_data = {
-                'estimated_monthly_sales': data.get('data', [{}])[0].get('estimated_sales'), # Illustrative
+                'estimated_monthly_sales': data.get('data', [{}])[0].get('estimated_sales'),
                 'number_of_sellers': data.get('data', [{}])[0].get('seller_count'),
                 'opportunity_score': data.get('data', [{}])[0].get('opportunity_score')
             }
