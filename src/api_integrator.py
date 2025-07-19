@@ -14,19 +14,19 @@ class APIIntegrator:
             click.echo("    Amazon API Key not provided. Skipping Amazon integration.")
             return {}
 
-        # --- AMAZON SELLING PARTNER API (SP-API) INTEGRATION ---
-        # This uses the Catalog Items API (v2022-04-01) as an example.
-        # You will need to replace 'YOUR_MARKETPLACE_ID' with the actual Amazon Marketplace ID.
+        # --- AMAZON SELLING PARTNER API (SP-API) - CATALOG ITEMS API INTEGRATION ---
+        # Endpoint for Catalog Items API (v2022-04-01) to get item details by ASIN.
+        # Replace 'YOUR_MARKETPLACE_ID' with the actual Amazon Marketplace ID (e.g., ATVPDKIKX0DER for US, A1F83G8C2ARO7P for UK).
         # Authentication for SP-API is complex (LWA authorization flow).
         # This example assumes a bearer token is obtained and used.
 
-        amazon_api_url = f"https://sellingpartnerapi-na.amazon.com/catalog/2022-04-01/items/{asin}" # Illustrative endpoint
+        amazon_api_url = f"https://sellingpartnerapi-eu.amazon.com/catalog/2022-04-01/items/{asin}" # Example for EU region
         headers = {
-            "x-amz-access-token": self.amazon_api_key, # Example, actual token might be different
+            "x-amz-access-token": self.amazon_api_key, # This should be your LWA access token
             "Content-Type": "application/json"
         }
         params = {
-            "marketplaceIds": "YOUR_MARKETPLACE_ID" # Replace with actual Marketplace ID (e.g., ATVPDKIKX0DER for US)
+            "marketplaceIds": "A1F83G8C2ARO7P" # UK Marketplace ID
         }
 
         try:
@@ -34,16 +34,15 @@ class APIIntegrator:
             response.raise_for_status() # Raise an exception for HTTP errors (4xx or 5xx)
             data = response.json()
 
-            # --- PARSE AMAZON SP-API RESPONSE ---
-            # The structure of the SP-API response can be complex.
-            # This is an illustrative example based on common data points.
-            # You will need to adjust these keys based on the actual response structure.
+            # --- PARSE AMAZON SP-API CATALOG ITEMS RESPONSE ---
+            # This parsing is based on common structures for the Catalog Items API.
+            # You may need to adjust keys based on the exact response for your specific product type.
             amazon_data = {
                 'asin': data.get('asin'),
                 'title': data.get('attributes', {}).get('item_name', [{}])[0].get('value'),
                 'buy_box_price': data.get('summaries', [{}])[0].get('buyBoxPrice', {}).get('amount'),
-                'sales_rank': data.get('salesRanks', [{}])[0].get('rank'), # Illustrative
-                'fba_fee': None, # FBA fees are typically calculated via a separate API or formula
+                'sales_rank': data.get('salesRanks', [{}])[0].get('rank'),
+                'fba_fee': None, # FBA fees are typically calculated via a separate API or formula (e.g., Product Fees API)
                 'referral_fee': None # Referral fees are typically calculated via a separate API or formula
             }
             return amazon_data
@@ -51,7 +50,7 @@ class APIIntegrator:
         except requests.exceptions.RequestException as e:
             click.echo(f"    Error during Amazon SP-API call: {e}")
             return {}
-        # --- END AMAZON SP-API INTEGRATION ---
+        # --- END AMAZON SP-API CATALOG ITEMS INTEGRATION ---
 
     def get_keepa_product_data(self, asin):
         click.echo(f"  Integrating with Keepa API for ASIN: {asin}...")
@@ -61,10 +60,10 @@ class APIIntegrator:
 
         # --- KEEPA API INTEGRATION ---
         # This uses the Product History API as an example.
-        # You will need to replace 'YOUR_KEEPA_API_DOMAIN' with the actual Keepa API domain (e.g., api.keepa.com).
-        # Authentication typically involves passing the API key as a query parameter.
+        # The domain 'api.keepa.com' is standard. Authentication is via the 'key' query parameter.
+        # 'domain=1' is for Amazon.com, you might need to adjust for other Amazon domains (e.g., 3 for UK).
 
-        keepa_api_url = f"https://api.keepa.com/product?key={self.keepa_api_key}&asin={asin}&domain=1" # Illustrative endpoint
+        keepa_api_url = f"https://api.keepa.com/product?key={self.keepa_api_key}&asin={asin}&domain=3" # Domain 3 for UK
 
         try:
             response = requests.get(keepa_api_url)
@@ -72,14 +71,13 @@ class APIIntegrator:
             data = response.json()
 
             # --- PARSE KEEPA API RESPONSE ---
-            # The structure of the Keepa API response can be complex.
-            # This is an illustrative example based on common data points.
-            # You will need to adjust these keys based on the actual response structure.
+            # Keepa API responses can be nested. This parsing is based on common data points.
+            # You will need to adjust these keys based on the exact response structure for your query.
             keepa_data = {
-                'historical_price': data.get('products', [{}])[0].get('data', {}).get('AMAZON'), # Illustrative
+                'historical_price': data.get('products', [{}])[0].get('data', {}).get('AMAZON'), # Example: Amazon price history
                 'sales_rank_history': data.get('products', [{}])[0].get('data', {}).get('SALES_RANK'),
                 'buy_box_history': data.get('products', [{}])[0].get('data', {}).get('BUY_BOX'),
-                'estimated_sales_velocity': data.get('products', [{}])[0].get('stats', {}).get('avg180', {}).get('salesRank') # Illustrative
+                'estimated_sales_velocity': data.get('products', [{}])[0].get('stats', {}).get('avg180', {}).get('salesRank') # Example: 180-day average sales rank
             }
             return keepa_data
 
@@ -96,15 +94,14 @@ class APIIntegrator:
 
         # --- JUNGLE SCOUT API INTEGRATION ---
         # This uses the Product Database API as an example.
-        # You will need to replace 'YOUR_JUNGLE_SCOUT_API_DOMAIN' with the actual Jungle Scout API domain.
-        # Authentication typically involves an API key in the header or as a query parameter.
+        # The endpoint and authentication method might vary based on your Jungle Scout plan.
 
-        jungle_scout_api_url = f"https://api.junglescout.com/api/v1/products" # Illustrative endpoint
+        jungle_scout_api_url = f"https://api.junglescout.com/api/v1/products" # Common endpoint
         headers = {
-            "Authorization": f"Bearer {self.jungle_scout_api_key}", # Example, actual token might be different
+            "Authorization": f"Bearer {self.jungle_scout_api_key}", # Common authentication method
             "Content-Type": "application/json"
         }
-        params = {"asin": asin} # Example parameter, adjust as per Jungle Scout docs
+        params = {"asin": asin} # Common parameter
 
         try:
             response = requests.get(jungle_scout_api_url, headers=headers, params=params)
@@ -112,9 +109,8 @@ class APIIntegrator:
             data = response.json()
 
             # --- PARSE JUNGLE SCOUT API RESPONSE ---
-            # The structure of the Jungle Scout API response can vary.
-            # This is an illustrative example based on common data points.
-            # You will need to adjust these keys based on the actual response structure.
+            # Jungle Scout API responses can vary. This parsing is based on common data points.
+            # You will need to adjust these keys based on the exact response structure for your query.
             jungle_scout_data = {
                 'estimated_monthly_sales': data.get('data', [{}])[0].get('estimated_sales'), # Illustrative
                 'number_of_sellers': data.get('data', [{}])[0].get('seller_count'),
