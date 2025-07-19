@@ -19,32 +19,32 @@ The `wholesaleFBA` system operates through a seamless, automated workflow, with 
 
 ```mermaid
 graph TD
-    A[Supplier Data (CSV/Excel)] --> B(Email Inbox - Conceptual Automation);
-    B --> C{Google Sheet - Initial Processing};
-    C -- VBA Macro (Conceptual) --> D[Cleansed Supplier Data in Google Sheet];
-    D -- Python Script (wholesaleFBA) --> E(API Integration Layer);
-    E -- Amazon SP-API (Catalog Items) --> F[Product Details: ASIN, Title, Buy Box Price, Sales Rank, Main Image URL];
-    E -- Amazon SP-API (Product Fees) --> G[FBA Fee, Referral Fee];
-    E -- Keepa API --> H[Barcode to ASIN Conversion, Historical Price, Sales Rank History, Buy Box History, Estimated Sales Velocity];
-    E -- Jungle Scout API --> I[Estimated Monthly Sales, Number of Sellers, Opportunity Score];
-    F & G & H & I --> J{Python Script Writes Enriched Data Back to Google Sheet};
-    J --> K[Enriched Google Sheet];
-    K -- VBA Macro (Conceptual) --> L(Final Calculations & Visualisation);
-    L -- Image Verification --> M[Match Status];
-    L -- Profit Calculation --> N[Profit, Profit %, ROI];
-    L -- Unit Recommendation --> O[Recommended Units];
-    L -- Conditional Formatting --> P[Visual Profitability (Red to Green)];
-    P --> Q[Actionable Insights for Purchasing Decisions];
+    A["Supplier Data (CSV/Excel)"] --> B("Email Inbox - Conceptual Automation");
+    B --> C{"Google Sheet - Initial Processing"};
+    C -- "VBA Macro (Conceptual)" --> D["Cleansed Supplier Data in Google Sheet"];
+    D -- "Python Script (wholesaleFBA)" --> E("API Integration Layer");
+    E -- "Amazon SP-API (Catalog Items)" --> F["Product Details: ASIN, Title, Buy Box Price, Sales Rank, Main Image URL"];
+    E -- "Amazon SP-API (Product Fees)" --> G["FBA Fee, Referral Fee"];
+    E -- "Keepa API" --> H["Barcode to ASIN Conversion, Historical Price, Sales Rank History, Buy Box History, Estimated Sales Velocity"];
+    E -- "Jungle Scout API" --> I["Estimated Monthly Sales, Number of Sellers, Opportunity Score"];
+    F & G & H & I --> J{"Python Script Writes Enriched Data Back to Google Sheet"};
+    J --> K["Enriched Google Sheet"];
+    K -- "VBA Macro (Conceptual)" --> L("Final Calculations & Visualisation");
+    L -- "Image Verification" --> M["Match Status"];
+    L -- "Profit Calculation" --> N["Profit, Profit %, ROI"];
+    L -- "Unit Recommendation" --> O["Recommended Units"];
+    L -- "Conditional Formatting" --> P["Visual Profitability (Red to Green)"];
+    P --> Q["Actionable Insights for Purchasing Decisions"];
 
-    subgraph Phase 1: Data Ingestion & Cleansing
+    subgraph "Phase 1: Data Ingestion & Cleansing"
         A --> D;
     end
 
-    subgraph Phase 2: Data Enrichment & API Integration
+    subgraph "Phase 2: Data Enrichment & API Integration"
         D --> J;
     end
 
-    subgraph Phase 3: Final Analysis & Reporting
+    subgraph "Phase 3: Final Analysis & Reporting"
         K --> Q;
     end
 ```
@@ -53,7 +53,7 @@ graph TD
 
 1.  **Supplier Data Ingestion & Initial Cleansing (Google Sheets & VBA)**
     *   **Initial Data Receipt:** Raw supplier data (CSV or Excel) is received.
-    *   **Conceptual Email Automation:** (Due to signed NDA, actual code cannot be provided. This is a conceptual outline.) An automated process would ideally grab supplier files from a dedicated email inbox and pass them to the Google Sheets API for initial processing.
+    *   **Conceptual Email Automation:** (Due to signed NDA, actual code cannot be provided. This is a conceptual outline.) An automated process would ideally grab supplier files from a dedicated email inbox and pass them to the Google Sheets API for initial processing by the VBA macro.
     *   **VBA Macro Processing:** A sophisticated VBA macro (conceptual code provided in `vba/conceptual_macro.vba`) embedded within the Google Sheet performs the initial cleansing and structuring of the raw supplier data. This includes extracting key fields such as `image`, `barcode`, `price`, `quantity`, and `MOQ`, and removing irrelevant information.
     *   **Output:** A clean, structured Google Sheet, serving as the primary input for the Python-based enrichment process.
 
